@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import re
 from typing import Optional, Dict, Any
 
+
 def _clean_price(text: Optional[str]) -> Optional[float]:
 	if not text:
 		return None
@@ -11,13 +12,14 @@ def _clean_price(text: Optional[str]) -> Optional[float]:
 	
 	# if ',' in s and s.count(',') == 1 and '.' not in s:
 	# 	s = s.replace(',', '.')
-		
+	
 	s = s.replace(',', '') if '.' in s else s
 	try:
 		return float(s)
 	except ValueError as e:
 		print(e)
 		return None
+
 
 def parse_amazon_product(html: str) -> Dict[str, Any]:
 	soup = BeautifulSoup(html, 'lxml')
@@ -38,9 +40,8 @@ def parse_amazon_product(html: str) -> Dict[str, Any]:
 	
 	return {
 		'title': title,
-		'price': price,
+		'price': f'{price: ,.2f}',
 		'price_text': price_text,
 		'category': category,
 		'availability': availability
 	}
-		
