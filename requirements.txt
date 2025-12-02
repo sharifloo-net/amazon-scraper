@@ -1,0 +1,6 @@
+urllib3
+requests
+requests[socks]
+pysocks
+beautifulsoup4
+lxml
