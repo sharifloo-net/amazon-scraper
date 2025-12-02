@@ -36,15 +36,16 @@ class Database:
 	def ensure_product(self, url: str, title: str, price: Optional[float]):
 		"""Insert product if new. Return product_id."""
 		cur = self.conn.cursor()
-		cur.execute('SELECT id FROM product WHERE url = ?', (url,))
-		row = cur.fetchone()
+		cur.execute('SELECT id FROM products WHERE url = ?', (url,))
+		row: sqlite3.Row = cur.fetchone()
 		
 		now = datetime.now(timezone.utc).isoformat()
 		
 		if row:
+			print(f'Row: {row['id']}')
 			product_id = row['id']
 			cur.execute(
-				"UPDATE products SET title = ?, last_price = ?, last_checked = ?, WHERE id = ?",
+				"UPDATE products SET title = ?, last_price = ?, last_checked = ? WHERE id = ?",
 				(title, price, now, product_id)
 			)
 		else:
@@ -60,7 +61,7 @@ class Database:
 	def add_price_history(self, product_id: int, price: Optional[float]):
 		cur = self.conn.cursor()
 		cur.execute(
-			"INSERT INTO price_history (product_id, price, checked_id) VALUES (?, ?, ?)",
+			"INSERT INTO price_history (product_id, price, checked_at) VALUES (?, ?, ?)",
 			(product_id, price, datetime.now(timezone.utc).isoformat())
 		)
 		self.conn.commit()
