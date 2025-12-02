@@ -28,7 +28,11 @@ class HttpClient:
 		self.session.headers.update({
 			"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
 			              "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-			"Accept-Language": "en-US,en;q=0.9"
+			"Accept-Language": "en-US,en;q=0.5",
+			'Host': 'www.amazon.com',
+			'Origin': 'https://www.amazon.com',
+			'Connection': 'keep - alive',
+			'Referer': 'https://www.amazon.com'
 		})
 		
 	def get(self, url: str):
