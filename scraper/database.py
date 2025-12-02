@@ -42,7 +42,6 @@ class Database:
 		now = datetime.now(timezone.utc).isoformat()
 		
 		if row:
-			print(f'Row: {row['id']}')
 			product_id = row['id']
 			cur.execute(
 				"UPDATE products SET title = ?, last_price = ?, last_checked = ? WHERE id = ?",
