@@ -18,7 +18,7 @@ class HttpClient:
 			total=3,
 			backoff_factor=0.3,
 			status_forcelist=[429, 500, 502, 503, 504],
-			allowed_methods=['GET', 'HEAD']
+			allowed_methods=['GET', 'HEAD', 'OPTIONS']
 		)
 		
 		adapter = HTTPAdapter(max_retries=retry_strategy)
@@ -31,7 +31,7 @@ class HttpClient:
 			"Accept-Language": "en-US,en;q=0.5",
 			'Host': 'www.amazon.com',
 			'Origin': 'https://www.amazon.com',
-			'Connection': 'keep - alive',
+			'Connection': 'keep-alive',
 			'Referer': 'https://www.amazon.com'
 		})
 		

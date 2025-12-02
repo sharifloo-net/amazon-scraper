@@ -29,7 +29,7 @@ def main():
 	# Print parsed output
 	print('\nSaved to database.')
 	print(f'Product ID: {product_id}')
-	print(f'Price: {price}')
+	print(f'Price: {price:,.2f}')
 	print(f'Category: {data.get('category')}')
 	print(f'Availability: {data.get('availability')}')
 
