@@ -4,3 +4,4 @@ requests[socks]
 pysocks
 beautifulsoup4
 lxml
+python-dotenv

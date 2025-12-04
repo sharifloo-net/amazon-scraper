@@ -1,5 +1,9 @@
 .idea
 .venv
+logs
+.env
 __pycache__
 identifier.sqlite
-data.db
+*.db
+*.csv
+test.py

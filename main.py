@@ -1,39 +1,21 @@
-from scraper.client import HttpClient
-from scraper.parser import parse_amazon_product
-from scraper.database import Database
+import argparse
+from runners.run_once import run_once
+from runners.run_daily import run_daily
 
 
 def main():
-	with open('products.txt', 'r', encoding='utf-8') as f:
-		urls = [line.strip() for line in f.readlines() if line.strip()]
-	client = HttpClient()
-	db = Database()
+	parser = argparse.ArgumentParser(description='Amazon scraper runner')
+	sub = parser.add_subparsers(dest='command')
+	sub.required = False
+	sub.add_parser('once', help='Run scraping once')
+	sub.add_parser('daily', help='Run scrape then export CSV')
+	args = parser.parse_args()
+	cmd = args.command or 'once'
 	
-	for url in urls:
-		print('Scraping:', url)
-		print('Fetching page...')
-		html = client.get(url)
-		
-		print('Parsing...')
-		data = parse_amazon_product(html)
-		
-		# Extract parsed fields
-		title = data.get('title')
-		price = data.get('price')
-		
-		# Save/update product
-		product_id = db.ensure_product(url, title, price)
-		
-		# Add price history entry
-		db.add_price_history(product_id, price)
-		
-		# Print parsed output
-		print('\nSaved to database.')
-		print(f'Product ID: {product_id}')
-		print(f'Price: {price:,.2f}' if price else 'Price: Not available!')
-		print(f'Category: {data.get('category')}' if data.get('category') else 'Category: Not available!')
-		print(f'Availability: {data.get('availability')}' if data.get('availability') else 'Availability: Not available!')
-		print()
+	if cmd == 'daily':
+		run_daily()
+	else:
+		run_once()
 
 
 if __name__ == '__main__':
