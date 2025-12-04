@@ -5,3 +5,4 @@ pysocks
 beautifulsoup4
 lxml
 python-dotenv
+pytest
