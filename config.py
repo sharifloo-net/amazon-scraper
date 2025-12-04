@@ -34,6 +34,17 @@ LOG_LEVEL: str = os.getenv('LOG_LEVEL', 'INFO').upper()
 LOG_FILE: str = os.getenv('LOG_FILE', 'logs/amazon_scraper.log')
 
 # Ensure directories exist
-Path(REPORTS_DIR).mkdir(parents=True, exist_ok=True)
+
+report_dir_current_path = Path(REPORTS_DIR)
+
+if not report_dir_current_path.is_absolute():
+	report_dir_current_path = Path(__file__).resolve().parent / report_dir_current_path
+	
+Path(report_dir_current_path).mkdir(parents=True, exist_ok=True)
+
 if LOG_FILE:
-	Path(LOG_FILE).parent.mkdir(parents=True, exist_ok=True)
+	_log_path = Path(LOG_FILE)
+	if not _log_path.is_absolute():
+		_log_path = Path(__file__).resolve().parent / _log_path
+	_log_path.parent.mkdir(parents=True, exist_ok=True)
+	LOG_FILE = str(_log_path)
