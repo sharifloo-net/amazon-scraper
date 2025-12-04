@@ -55,7 +55,7 @@ def run_daily():
 		reports_dir.mkdir(parents=True, exist_ok=True)
 		
 		# Export to CSV
-		filename = export_prices_to_csv(rows, str(reports_dir))
+		filename = export_prices_to_csv(export_rows, str(reports_dir))
 		logger.info(f"Exported price data to: {filename}")
 	
 	except Exception as e:
