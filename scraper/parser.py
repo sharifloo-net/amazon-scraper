@@ -13,11 +13,25 @@ def _clean_price(text: Optional[str]) -> Optional[float]:
 	# if ',' in s and s.count(',') == 1 and '.' not in s:
 	# 	s = s.replace(',', '.')
 	
-	s = s.replace(',', '') if '.' in s else s
+	if ',' in s and '.' in s:
+		if s.rfind(',') > s.rfind('.'):
+			s = s.replace('.', '')
+			s = s.replace(',', '.')
+		else:
+			s = s.replace(',', '')
+	elif ',' in s:
+		if s.count(',') == 1 and len(s.split(',')[-1]) == 2:
+			s = s.replace(',', '.')
+		else:
+			s = s.replace(',', '')
+	elif '.' in s:
+		if s.count('.') == 1 and len(s.split('.')[-1]) == 2:
+			pass
+		else:
+			s = s.replace('.', '')
 	try:
 		return float(s)
-	except ValueError as e:
-		print(e)
+	except Exception:
 		return None
 
 
