@@ -187,3 +187,22 @@ class Database:
 		)
 		self.conn.commit()
 		return cur.fetchall()
+
+	def get_price_history(self, product_id: Optional[int] = None):
+		cur = self.conn.cursor()
+		if product_id is not None:
+			cur.execute(
+				"SELECT ph.product_id, p.title, p.url, ph.price, ph.checked_at "
+				"FROM price_history ph JOIN products p ON p.id = ph.product_id "
+				"WHERE ph.product_id = ? "
+				"ORDER BY ph.checked_at",
+				(product_id,)
+			)
+		else:
+			cur.execute(
+				"SELECT ph.product_id, p.title, p.url, ph.price, ph.checked_at "
+				"FROM price_history ph JOIN products p ON p.id = ph.product_id "
+				"ORDER BY ph.product_id, ph.checked_at"
+			)
+		self.conn.commit()
+		return cur.fetchall()
