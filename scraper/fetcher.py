@@ -1,4 +1,5 @@
 import time
+import random
 from typing import Dict, Any, Optional
 from requests import Session
 from requests.adapters import HTTPAdapter
@@ -87,8 +88,10 @@ def get_page(url: str) -> str:
 		
 		# Add delay between requests to be nice to Amazon
 		if REQUEST_DELAY > 0:
-			logger.debug(f"Waiting {REQUEST_DELAY} seconds before request")
-			time.sleep(REQUEST_DELAY)
+			jitter = REQUEST_DELAY * 0.5
+			delay = max(0.0, REQUEST_DELAY + random.uniform(-jitter, jitter))
+			logger.debug(f"Waiting {delay:.2f} seconds before request")
+			time.sleep(delay)
 		
 		logger.info(f"Fetching URL: {url}")
 		if proxies:
