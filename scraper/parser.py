@@ -3,16 +3,12 @@ import re
 from typing import Optional, Dict, Any
 
 
-def _clean_price(text: Optional[str]) -> Optional[float]:
+def clean_price(text: Optional[str]) -> Optional[float]:
 	if not text:
 		return None
 	s = re.sub(r'[^\d.,]', '', text)
 	if not s:
 		return None
-	
-	# if ',' in s and s.count(',') == 1 and '.' not in s:
-	# 	s = s.replace(',', '.')
-	
 	if ',' in s and '.' in s:
 		if s.rfind(',') > s.rfind('.'):
 			s = s.replace('.', '')
@@ -48,7 +44,7 @@ def parse_amazon_product(html: str) -> Dict[str, Any]:
 	
 	price_el = soup.select_one('#corePrice_feature_div > div > div > span.a-price > span.a-offscreen')
 	price_text = price_el.get_text(strip=True) if price_el else None
-	price = _clean_price(price_text)
+	price = clean_price(price_text)
 	
 	category_el = soup.select_one("#wayfinding-breadcrumbs_feature_div > ul")
 	if category_el:

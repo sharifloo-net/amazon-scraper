@@ -1,6 +1,6 @@
 import pytest
 
-from scraper.parser import _clean_price
+from scraper.parser import clean_price
 
 
 @pytest.mark.parametrize(
@@ -20,4 +20,4 @@ from scraper.parser import _clean_price
 	]
 )
 def test_clean_price_formats(raw, expected):
-	assert _clean_price(raw) == expected
+	assert clean_price(raw) == expected
