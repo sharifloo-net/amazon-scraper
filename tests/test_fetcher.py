@@ -17,7 +17,7 @@ class TestCreateSession:
 		
 		# Check retry configuration
 		adapter = session.adapters['http://']
-		assert adapter.max_retries.total == 3  # Default from config
+		assert adapter.max_retries.total == 5  # Default from config
 		assert adapter.max_retries.status_forcelist == [429, 500, 502, 503, 504]
 
 
