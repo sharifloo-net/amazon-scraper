@@ -13,8 +13,10 @@ def main():
 	cmd = args.command or 'once'
 	
 	if cmd == 'daily':
+		print("==> Running daily workflow")
 		run_daily()
 	else:
+		print("==> Running once")
 		run_once()
 
 

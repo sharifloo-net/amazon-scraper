@@ -28,7 +28,7 @@ def run_daily():
 		logger.info("Starting daily scraping and reporting")
 		
 		# Run the scraper
-		run_once()
+		run_once(verbose=False)
 		
 		# Export data to CSV
 		db = Database()
@@ -36,8 +36,10 @@ def run_daily():
 		
 		if not rows:
 			logger.warning("No price data found to export")
+			print("No price data found to export.")
 			return
 		
+		print(f"Preparing to export {len(rows)} rows to CSV...")
 		export_rows = []
 		for row in rows:
 			export_rows.append((
@@ -57,12 +59,14 @@ def run_daily():
 		# Export to CSV
 		filename = export_prices_to_csv(export_rows, str(reports_dir))
 		logger.info(f"Exported price data to: {filename}")
+		print(f"Exported {len(export_rows)} rows to: {filename}")
 	
 	except Exception as e:
 		logger.critical(f"Error in daily run: {str(e)}", exc_info=True)
 		raise
 	finally:
 		logger.info("Daily run completed")
+		print("==> Daily run completed")
 
 
 if __name__ == '__main__':

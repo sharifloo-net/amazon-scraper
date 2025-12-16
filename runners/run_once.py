@@ -70,7 +70,7 @@ def process_product(url: str, db: Database) -> None:
         raise
 
 
-def run_once():
+def run_once(verbose: bool = True):
     """Run the scraper once for all products."""
     try:
         # Resolve products file path
@@ -79,11 +79,18 @@ def run_once():
             root = Path(__file__).resolve().parent.parent
             products_file = root / products_file
         
+        if verbose:
+            print("==> Starting once run")
+            print(f"Products file: {products_file}")
         logger.info("Starting product scraper")
         urls = load_product_urls(str(products_file))
         
+        if verbose:
+            print(f"Loaded {len(urls)} URLs")
         if not urls:
             logger.warning("No product URLs found to process")
+            if verbose:
+                print("No product URLs found to process.")
             return
             
         db = Database()
@@ -92,6 +99,8 @@ def run_once():
             process_product(url, db)
             
         logger.info("Product scraping completed successfully")
+        if verbose:
+            print("==> Once run completed")
         
     except Exception as e:
         logger.critical(f"Fatal error in run_once: {str(e)}", exc_info=True)
