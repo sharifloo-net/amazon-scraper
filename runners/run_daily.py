@@ -1,12 +1,11 @@
 import logging
-from pathlib import Path
-from typing import List, Dict, Any
 
 # Import configuration
 import sys
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent))
-from config import REPORTS_DIR, LOG_LEVEL, LOG_FILE
+from config import LOG_LEVEL, LOG_FILE
 
 # Set up logging
 logging.basicConfig(
@@ -18,8 +17,6 @@ logger = logging.getLogger(__name__)
 
 # Local imports after config setup
 from runners.run_once import run_once
-from scraper.database import Database
-from reports.exporter import export_prices_to_csv
 
 
 def run_daily():
@@ -27,39 +24,19 @@ def run_daily():
 	try:
 		logger.info("Starting daily scraping and reporting")
 		
-		# Run the scraper
-		run_once(verbose=False)
+		# Run the scraper + export via run_once
+		summary = run_once(verbose=False)
+		urls = summary.get("urls", 0) if isinstance(summary, dict) else 0
+		exported = summary.get("exported_rows", 0) if isinstance(summary, dict) else 0
+		csv_path = summary.get("csv_path") if isinstance(summary, dict) else None
 		
-		# Export data to CSV
-		db = Database()
-		rows = db.get_all_prices()
-		
-		if not rows:
+		if exported:
+			print(f"Exported {exported} rows to: {csv_path}")
+		else:
 			logger.warning("No price data found to export")
 			print("No price data found to export.")
-			return
 		
-		print(f"Preparing to export {len(rows)} rows to CSV...")
-		export_rows = []
-		for row in rows:
-			export_rows.append((
-				row['id'],
-				row['title'] or '',
-				row['url'],
-				row['last_price'] or 0.0,
-				row['last_checked'] or '',
-			))
-		
-		# Ensure reports directory exists
-		reports_dir = Path(REPORTS_DIR)
-		if not reports_dir.is_absolute():
-			reports_dir = Path(__file__).resolve().parent.parent / reports_dir
-		reports_dir.mkdir(parents=True, exist_ok=True)
-		
-		# Export to CSV
-		filename = export_prices_to_csv(export_rows, str(reports_dir))
-		logger.info(f"Exported price data to: {filename}")
-		print(f"Exported {len(export_rows)} rows to: {filename}")
+		return summary
 	
 	except Exception as e:
 		logger.critical(f"Error in daily run: {str(e)}", exc_info=True)
