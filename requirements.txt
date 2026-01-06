@@ -7,3 +7,6 @@ lxml
 python-dotenv
 pytest
 setuptools
+# CLI enhancements
+typer
+rich
