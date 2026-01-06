@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 def version_callback(value: bool):
     """Show version and exit."""
     if value:
-        console.print("Amazon Price Tracker v1.0.0", style="bold green")
+        console.print("Amazon Price Tracker v1.1.0", style="bold green")
         raise typer.Exit()
 
 @app.callback()
