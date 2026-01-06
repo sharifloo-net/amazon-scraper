@@ -5,12 +5,15 @@ Status: CI via GitHub Actions, pytest tests, cron/systemd ready (informational o
 A small, production‑lean scraper that tracks Amazon product prices, stores price history, and exports daily CSV reports. Ready for cron/systemd scheduling, proxies, and logging.
 
 ## Features
-- Requests + BeautifulSoup scraper with retry/backoff and headers
+- BeautifulSoup scraper with retry/backoff and headers
 - Robust price parsing (US/EU formats) and category extraction
-- SQLite DB with `products` and `price_history`
-- Runners: `once` (scrape + CSV export) and `daily` (wrapper around `once`, prints summary)
-- CSV exports to `reports/` and file logging to absolute `LOG_FILE`
-- Env‑driven config via `.env`; optional single proxy or random proxies
+- SQLite DB with `products` and `price_history` tables
+- Simple CLI with `once` and `daily` commands
+- CSV exports to `reports/` with timestamps
+- Colorful console output with progress indicators
+- Configurable logging with different verbosity levels
+- Environment-based configuration via `.env`
+- Optional proxy support (single or random)
  
 ## Problem → Solution
 - Problem: Manually tracking product prices and availability is tedious and error‑prone. Pages change, requests get throttled, and insights are lost without a history.
@@ -138,22 +141,60 @@ Terminal/log excerpt:
 2025-12-04 11:47:02,522 - reports.exporter  - INFO - Successfully exported 2 rows to reports/prices_2025-12-04_11-47-01.csv
 ```
 
-CLI output (once):
+CLI output (successful run):
 ```text
-==> Running once
+$ python main.py once
 ==> Starting once run
 Products file: /path/to/amazon_scraper/products.txt
-Loaded 3 URLs
-Preparing to export 3 rows to CSV...
-Exported 3 rows to: /path/to/amazon_scraper/reports/prices_2025-12-04_11-47-01.csv
+Loaded 9 URLs
+⠧ Running one-time scrape...
+Preparing to export 12 rows to CSV...
+Exported 12 rows to: /path/to/amazon_scraper/reports/prices_2026-01-06_11-12-52.csv
 ==> Once run completed
+✅ Scraping completed successfully!
 ```
 
-CLI output (daily):
+CLI output (with error):
 ```text
-==> Running daily workflow
-Exported 3 rows to: /path/to/amazon_scraper/reports/prices_2025-12-04_11-47-01.csv
+$ python main.py once
+==> Starting once run
+Products file: /path/to/amazon_scraper/products.txt
+Loaded 9 URLs
+⠧ Running one-time scrape...
+❌ Error: HTTPSConnectionPool(host='www.amazon.com', port=443): Max retries exceeded with url: /SAMSUNG-Essential-Computer-Advanced-LS27D590F/dp/B0DB9Q5G3R (Caused by 
+NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x76b67268a490>: Failed to establish a new connection: [Errno 111] Connection refused'))
+```
+
+CLI output (daily run):
+```text
+$ python main.py daily
+==> Starting daily run
+Products file: /path/to/amazon_scraper/products.txt
+Loaded 9 URLs
+⠧ Running daily scrape...
+Preparing to export 12 rows to CSV...
+Exported 12 rows to: /path/to/amazon_scraper/reports/prices_2026-01-06_11-15-30.csv
 ==> Daily run completed
+✅ Daily scraping completed!
+```
+
+Help output:
+```text
+$ python main.py --help
+
+ Usage: main.py [OPTIONS] COMMAND [ARGS]...                                                                                                                                        
+
+ Amazon Price Tracker - Scrape and monitor product prices                                                                                                                          
+
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --verbose  -v      INTEGER  Increase verbosity (can be used multiple times) [default: 0]                                                                                        │
+│ --version                   Show version and exit.                                                                                                                              │
+│ --help                      Show this message and exit.                                                                                                                         │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ once    Run scraping once and export results                                                                                                                                    │
+│ daily   Run scraping and generate daily report                                                                                                                                  │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
 SQLite snapshot (products):
@@ -165,11 +206,33 @@ id | title                 | url                                   | last_price 
 ```
 
 ## CLI
-```
-python main.py -h
+
+### Basic Usage
+```bash
+# Show help
+python main.py --help
+
+# Show version
+python main.py --version
+
+# Run once with default settings
 python main.py once
+
+# Run daily report
 python main.py daily
+
+# Enable verbose output (use -v, -vv, or -vvv for more details)
+python main.py -v once
 ```
+
+### Options
+- `--help` - Show help message and exit
+- `--version` - Show version and exit
+- `-v, --verbose` - Increase verbosity (can be used multiple times: -v, -vv, -vvv)
+
+### Commands
+- `once` - Run scraping once and export results
+- `daily` - Run scraping and generate daily report
 
 ## How to adapt to other sites
 - Update selectors in `scraper/parser.py` (e.g., `parse_*` function to extract title/price/category/availability for the new site).
@@ -186,7 +249,7 @@ python main.py daily
   /home/abolfazl/Documents/python/amazon_scraper/main.py daily \
   >> /home/abolfazl/Documents/python/amazon_scraper/logs/cron.log 2>&1
 ```
-- systemd (alternative): create a oneshot service + timer pointing to `main.py daily`.
+- systemd (alternative): create an oneshot service + timer pointing to `main.py daily`.
 
 ## Database schema
 - `products(id, title, url UNIQUE, last_price, last_checked)`
